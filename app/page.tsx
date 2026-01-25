@@ -61,7 +61,9 @@ export default function Home() {
       track.track_id.toLowerCase().includes(s) ||
       (track.seed && track.seed.toLowerCase().includes(s)) ||
       (track.description && track.description.toLowerCase().includes(s)) ||
-      (Array.isArray(track.tags) ? track.tags.some(t => t.toLowerCase().includes(s)) : (track.tags as string).toLowerCase().includes(s));
+      (track.seed && track.seed.toLowerCase().includes(s)) ||
+      (track.description && track.description.toLowerCase().includes(s)) ||
+      (Array.isArray(track.tags) ? track.tags.some(t => t.toLowerCase().includes(s)) : (track.tags as unknown as string || '').toLowerCase().includes(s));
 
     if (filter === 'ready') return contentMatch && track.hasAudio && track.hasVideo;
     if (filter === 'missing_video') return contentMatch && track.hasAudio && !track.hasVideo;

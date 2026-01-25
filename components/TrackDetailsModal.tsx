@@ -64,11 +64,19 @@ export function TrackDetailsModal({ track, isOpen, onClose }: TrackDetailsModalP
                         <div className="space-y-2">
                             <Label icon={<Tag size={16} />} text="Tags" />
                             <div className="flex flex-wrap gap-2 p-3 bg-zinc-900/50 rounded-lg border border-zinc-800 min-h-[80px]">
-                                {(Array.isArray(track.tags) ? track.tags : (track.tags || '').split('|')).map((tag, i) => (
-                                    <span key={i} className="px-2 py-1 bg-blue-500/10 text-blue-400 rounded text-xs border border-blue-500/20">
-                                        #{tag.trim()}
-                                    </span>
-                                ))}
+                                {(() => {
+                                    // Handle both string[] (from interface/JSON) and string (legacy/fallback)
+                                    // Use 'unknown' cast to allow treating it as string for the split fallback
+                                    const tags: string[] = Array.isArray(track.tags)
+                                        ? track.tags
+                                        : (track.tags as unknown as string || '').split('|');
+
+                                    return tags.map((tag, i) => (
+                                        <span key={i} className="px-2 py-1 bg-blue-500/10 text-blue-400 rounded text-xs border border-blue-500/20">
+                                            #{tag.trim()}
+                                        </span>
+                                    ));
+                                })()}
                             </div>
                         </div>
                     </div>

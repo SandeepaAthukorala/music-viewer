@@ -185,7 +185,7 @@ export function TrackCard({ track }: TrackCardProps) {
                                 BPM: {track.prompt.match(/(\d+ BPM)/)?.[1] || 'N/A'}
                             </span>
                             <span className="text-[10px] px-2 py-0.5 rounded-full bg-zinc-800 text-zinc-400 border border-zinc-700 truncate max-w-[150px]">
-                                {Array.isArray(track.tags) ? track.tags[0] : track.tags}
+                                {Array.isArray(track.tags) ? track.tags[0] : (track.tags as unknown as string).split('|')[0]}
                             </span>
                         </div>
 
