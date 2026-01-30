@@ -63,7 +63,7 @@ export default function Home() {
       (track.description?.toLowerCase()?.includes(s) ?? false) ||
       (track.prompt?.toLowerCase()?.includes(s) ?? false) ||
       (track.seo_keywords?.toLowerCase()?.includes(s) ?? false) ||
-      (Array.isArray(track.tags) && track.tags.some(t => t?.toLowerCase()?.includes(s) ?? false));
+      (Array.isArray(track.tags) && track.tags.some(t => typeof t === 'string' && t.toLowerCase().includes(s)));
 
     if (filter === 'ready') return contentMatch && track.hasAudio && track.hasVideo;
     if (filter === 'missing_video') return contentMatch && track.hasAudio && !track.hasVideo;
