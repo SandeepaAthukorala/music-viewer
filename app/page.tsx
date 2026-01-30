@@ -54,16 +54,22 @@ export default function Home() {
 
   const filteredTracks = data?.tracks.filter(track => {
     const s = search.toLowerCase();
+
+    // Helper function to safely check if a field contains the search term
+    const matchesSearch = (value: any): boolean => {
+      return typeof value === 'string' && value.toLowerCase().includes(s);
+    };
+
     const contentMatch =
-      (track.title?.toLowerCase()?.includes(s) ?? false) ||
-      (track.album_name?.toLowerCase()?.includes(s) ?? false) ||
-      (track.id?.toLowerCase()?.includes(s) ?? false) ||
-      (track.track_id?.toLowerCase()?.includes(s) ?? false) ||
-      (track.seed?.toLowerCase()?.includes(s) ?? false) ||
-      (track.description?.toLowerCase()?.includes(s) ?? false) ||
-      (track.prompt?.toLowerCase()?.includes(s) ?? false) ||
-      (track.seo_keywords?.toLowerCase()?.includes(s) ?? false) ||
-      (Array.isArray(track.tags) && track.tags.some(t => typeof t === 'string' && t.toLowerCase().includes(s)));
+      matchesSearch(track.title) ||
+      matchesSearch(track.album_name) ||
+      matchesSearch(track.id) ||
+      matchesSearch(track.track_id) ||
+      matchesSearch(track.seed) ||
+      matchesSearch(track.description) ||
+      matchesSearch(track.prompt) ||
+      matchesSearch(track.seo_keywords) ||
+      (Array.isArray(track.tags) && track.tags.some(matchesSearch));
 
     if (filter === 'ready') return contentMatch && track.hasAudio && track.hasVideo;
     if (filter === 'missing_video') return contentMatch && track.hasAudio && !track.hasVideo;
