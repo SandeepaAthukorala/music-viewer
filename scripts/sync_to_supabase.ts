@@ -40,7 +40,7 @@ function parseCsv<T>(filePath: string): Promise<T[]> {
         Papa.parse(fileContent, {
             header: true,
             complete: (results) => resolve(results.data as T[]),
-            error: (err) => reject(err),
+            error: (err: Error) => reject(err),
             skipEmptyLines: true,
         });
     });
