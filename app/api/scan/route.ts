@@ -1,45 +1,48 @@
 import { NextResponse } from 'next/server';
-import path from 'path';
-import fs from 'fs';
+import { supabase } from '@/lib/supabase';
+import { Track, Album } from '@/lib/types';
 
 export async function GET() {
     try {
-        // In Vercel/Isolated mode, we only read the library.json
-        // We do NOT check disk for video/audio existence dynamically.
+        // Fetch all tracks and albums
+        const { data: tracksData, error: tracksError } = await supabase
+            .from('tracks')
+            .select('*');
 
-        const jsonPath = path.join(process.cwd(), 'data', 'library.json');
+        if (tracksError) throw tracksError;
 
-        // In Vercel, data might need to be in `public` or bundled. 
-        // But assuming `data/library.json` is deployed:
-        if (!fs.existsSync(jsonPath)) {
-            // Fallback for Vercel if not copied?
-            // Ideally library.json should be imported or read.
-            return NextResponse.json({
-                tracks: [],
-                stats: {
-                    totalTracks: 0,
-                    audioFound: 0,
-                    videosRendered: 0,
-                    styles: [],
-                    lastScan: new Date().toISOString()
-                }
-            });
-        }
+        // Fetch albums to get track counts if needed, though we can compute it
+        // Or just return the tracks as the main scan result
+        // The original response structure had: { tracks: [], stats: {} }
+        // We will try to match that.
 
-        const fileContents = fs.readFileSync(jsonPath, 'utf8');
-        const data = JSON.parse(fileContents);
+        const { data: albumsData, error: albumsError } = await supabase
+            .from('albums')
+            .select('*');
 
-        // FORCE "Lite Mode" -> Disable all media playback in UI
-        if (data.tracks) {
-            data.tracks.forEach((t: any) => {
-                t.hasAudio = false;
-                t.hasVideo = false;
-            });
-        }
+        if (albumsError) throw albumsError;
 
-        return NextResponse.json(data);
+        const tracks = tracksData.map((t: any) => ({
+            ...t,
+            id: t.track_id, // Map track_id to id for frontend compatibility if needed
+            // Default status for now
+            hasAudio: false,
+            hasVideo: false,
+        })) as Track[];
+
+        const totalTracks = tracks.length;
+
+        return NextResponse.json({
+            tracks,
+            stats: {
+                totalTracks,
+                audioFound: 0, // In Supabase mode we might need another way to check file existence? Or assume false for checking?
+                videosRendered: 0,
+                lastScan: new Date().toISOString()
+            }
+        });
     } catch (error) {
         console.error('Scan API Error:', error);
-        return NextResponse.json({ error: 'Failed to load library' }, { status: 500 });
+        return NextResponse.json({ error: 'Failed to load library from Supabase' }, { status: 500 });
     }
 }

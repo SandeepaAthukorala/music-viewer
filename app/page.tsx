@@ -55,15 +55,15 @@ export default function Home() {
   const filteredTracks = data?.tracks.filter(track => {
     const s = search.toLowerCase();
     const contentMatch =
-      track.title.toLowerCase().includes(s) ||
-      track.album_name.toLowerCase().includes(s) ||
-      track.id.toLowerCase().includes(s) ||
-      track.track_id.toLowerCase().includes(s) ||
-      (track.seed && track.seed.toLowerCase().includes(s)) ||
-      (track.description && track.description.toLowerCase().includes(s)) ||
-      (track.seed && track.seed.toLowerCase().includes(s)) ||
-      (track.description && track.description.toLowerCase().includes(s)) ||
-      (Array.isArray(track.tags) ? track.tags.some(t => t.toLowerCase().includes(s)) : (track.tags as unknown as string || '').toLowerCase().includes(s));
+      (track.title?.toLowerCase().includes(s) || false) ||
+      (track.album_name?.toLowerCase().includes(s) || false) ||
+      (track.id?.toLowerCase().includes(s) || false) ||
+      (track.track_id?.toLowerCase().includes(s) || false) ||
+      (track.seed?.toLowerCase().includes(s) || false) ||
+      (track.description?.toLowerCase().includes(s) || false) ||
+      (track.prompt?.toLowerCase().includes(s) || false) ||
+      (track.seo_keywords?.toLowerCase().includes(s) || false) ||
+      (Array.isArray(track.tags) && track.tags.some(t => t?.toLowerCase().includes(s)));
 
     if (filter === 'ready') return contentMatch && track.hasAudio && track.hasVideo;
     if (filter === 'missing_video') return contentMatch && track.hasAudio && !track.hasVideo;
